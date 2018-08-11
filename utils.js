@@ -18,4 +18,4 @@ function createExtraMsgs({ header, data }) {
 	if (data.ext_urls) str += data.ext_urls.join('\n')
 	return str
 }
-module.exports = { capitalFirst, addXXXIntoText, createExtraMsgs, fncache }
+module.exports = { capitalFirst, addXXXIntoText, createExtraMsgs }

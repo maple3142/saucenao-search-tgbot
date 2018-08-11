@@ -1,5 +1,4 @@
-const { MINIUM_SIMILARITY } = require('./config')
-const { fncache } = require('./utils')
+const { MINIUM_SIMILARITY, DATABASE_URL } = require('./config')
 const { Client } = require('pg')
 const debug = require('debug')
 const $clog = (name, uid) => val => {
@@ -7,11 +6,13 @@ const $clog = (name, uid) => val => {
 	return val
 }
 
-const client = new Client({
-	connectionString:
-		'postgres://xkodchjqpjelpj:485b23f9231228e2bab2b2c725883ee5a8389802dba753ff54195ad16c3c78a2@ec2-50-17-250-38.compute-1.amazonaws.com:5432/di8qdgmmug00h', // eslint-disable-line max-len
+const opts = {
 	ssl: true
-})
+}
+if (DATABASE_URL) {
+	opts.connectionString = DATABASE_URL
+}
+const client = new Client(opts)
 
 client.connect()
 
