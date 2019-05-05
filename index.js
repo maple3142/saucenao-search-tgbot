@@ -1,7 +1,8 @@
 // https://github.com/yagop/node-telegram-bot-api/issues/476
 process.env.NTBA_FIX_319 = 1
 
-const { SAUCENAO_APIKEY, TG_TOKEN, PORT, WEBHOOK_URL } = require('./config')
+require('dotenv').config()
+
 const { createExtraMsgs } = require('./utils')
 const SauceNAO = require('saucenao')
 const TelegramBot = require('node-telegram-bot-api')
@@ -12,11 +13,11 @@ const $info = debug('saucenao-tg:info')
 const cmdHandlers = require('./cmd')
 const db = require('./db')
 
-const search = new SauceNAO(SAUCENAO_APIKEY)
-const bot = new TelegramBot(TG_TOKEN, { webHook: { autoOpen: false, port: PORT } })
+const search = new SauceNAO(process.env.SAUCENAO_APIKEY)
+const bot = new TelegramBot(process.env.TG_TOKEN, { webHook: { autoOpen: false, port: process.env.PORT || 8443 } })
 
 bot.openWebHook()
-	.then(() => bot.setWebHook(WEBHOOK_URL + '/bot' + TG_TOKEN))
+	.then(() => bot.setWebHook((process.env.WEBHOOK_URL || '127.0.0.1') + '/bot' + process.env.TG_TOKEN))
 	.then(() => bot.getWebHookInfo())
 	.then($log)
 
@@ -29,20 +30,18 @@ bot.on('message', async msg => {
 
 bot.on('text', async msg => {
 	$info(msg)
-	const uid = msg.from.id
 	if (msg.text.startsWith('/')) {
 		const [cmd, ...args] = msg.text
 			.slice(1)
 			.split(' ')
 			.map(x => x.trim())
 		if (cmd in cmdHandlers) {
-			const result = await cmdHandlers[cmd](msg, ...args)
-			bot.sendMessage(msg.chat.id, result)
+			await cmdHandlers[cmd](bot, msg, ...args)
 		} else {
 			bot.sendMessage(msg.chat.id, 'Command not found!')
 		}
 	} else {
-		bot.sendMessage(msg.chat.id, cmdHandlers.help())
+		cmdHandlers.help(bot, msg)
 	}
 })
 
@@ -57,12 +56,13 @@ bot.on('photo', async msg => {
 	const link = await bot.getFileLink(imgobj.file_id)
 	const { json: data } = await search(link)
 	$info(id, link, data.results)
-	const ms = await db.getUserMinSimilarity(uid)
-	const filteredResults = data.results.filter(r => parseFloat(r.header.similarity) >= ms)
+	const min_s = await db.getUserData(uid, 'min_similarity', parseInt(process.env.MIN_SIMILARITY))
+	const max_rc = await db.getUserData(uid, 'max_result_count', parseInt(process.env.MAX_RESULT_COUNT))
+	const filteredResults = data.results.filter(r => parseFloat(r.header.similarity) >= min_s).slice(0, max_rc)
 	for (const r of filteredResults) {
 		await bot.sendPhoto(id, r.header.thumbnail, { caption: r.data.title ? r.data.title : '' })
 		await bot.sendMessage(id, createExtraMsgs(r))
-		$info(id, r)
+		$info(`Data sent to ${id}`, r)
 	}
 	if (filteredResults.length === 0) {
 		await bot.sendMessage(id, 'No image found!')
