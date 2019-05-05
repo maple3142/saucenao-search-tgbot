@@ -1,13 +1,9 @@
-const { Client } = require('pg')
-const debug = require('debug')
+import { Client } from 'pg'
+import debug from 'debug'
 
 const log = debug('saucenao-tg:db')
-const $clog = (name, uid) => val => {
-	debug(`saucenao-tg:db`)(uid, val)
-	return val
-}
 
-const opts = {
+const opts: any = {
 	ssl: true
 }
 if (process.env.DATABASE_URL) {
@@ -17,16 +13,17 @@ const client = new Client(opts)
 
 client.connect()
 
-function isUserCreated(uid) {
+type UID = string | number
+export function isUserCreated(uid: UID) {
 	return client
-		.query('SELECT uid FROM userdata WHERE uid=$1', [uid])
+		.query('SELECT uid FROM userdata WHERE uid=$1', [uid.toString()])
 		.then(({ rows }) => rows.length > 0)
 		.then(result => {
 			log(`isUserCreated uid=${uid} result=${result}`)
 			return true
 		})
 }
-function createUser(uid) {
+export function createUser(uid: UID) {
 	return client
 		.query('INSERT INTO userdata (uid,min_similarity,max_result_count) VALUES ($1,$2,$3)', [
 			uid.toString(),
@@ -38,7 +35,7 @@ function createUser(uid) {
 			return true
 		})
 }
-function getUserData(uid, field, defaultValue) {
+export function getUserData<T>(uid: UID, field: string, defaultValue: T): Promise<T> {
 	// field is guaranteed to come from trusted input
 	return client
 		.query(`SELECT ${field} FROM userdata WHERE uid=$1`, [uid.toString()])
@@ -48,13 +45,9 @@ function getUserData(uid, field, defaultValue) {
 			return result
 		})
 }
-function setUserData(uid, field, value) {
-	return client
-		.query(`UPDATE userdata SET ${field}=$2 WHERE uid=$1`, [uid.toString(), value])
-		.then(() => {
-			log(`setUserData uid=${uid} field=${field} value=${value}`)
-			return true
-		})
+export function setUserData<T>(uid: UID, field: string, value: T): Promise<boolean> {
+	return client.query(`UPDATE userdata SET ${field}=$2 WHERE uid=$1`, [uid.toString(), value]).then(() => {
+		log(`setUserData uid=${uid} field=${field} value=${value}`)
+		return true
+	})
 }
-
-module.exports = { isUserCreated, createUser, getUserData, setUserData }
