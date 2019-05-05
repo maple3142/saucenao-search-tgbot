@@ -22,7 +22,7 @@ const SUPPORTED_VALUES = {
 const UNSUPPORTED_MSG =
 	'Configurable values:\n' +
 	Object.entries(SUPPORTED_VALUES)
-		.map((k, v) => `${k}: ${v}`)
+		.map(([k, v]) => `${k}: ${v}`)
 		.join('\n')
 export async function set(bot: TelegramBot, msg: Message, cfg: string, val: string) {
 	if (cfg === 'min_s') {
