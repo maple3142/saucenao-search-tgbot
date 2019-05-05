@@ -11,9 +11,12 @@ Create a `.env` file like this:
 ```env
 SAUCENAO_APIKEY=
 TG_TOKEN=
-HOST=
+HOST=127.0.0.1
 WEBHOOK_URL=
-DEBUG=
+DEBUG=saucenao-tg:*
+DATABASE_URL=
+MINIUM_SIMILARITY=50
+MAX_RESULT_COUNT=3
 ```
 
-And `npm start` to start the bot.
+And `yarn start` to start the bot.
