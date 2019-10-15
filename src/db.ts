@@ -20,7 +20,7 @@ export function isUserCreated(uid: UID) {
 		.then(({ rows }) => rows.length > 0)
 		.then(result => {
 			log(`isUserCreated uid=${uid} result=${result}`)
-			return true
+			return result
 		})
 }
 export function createUser(uid: UID) {
