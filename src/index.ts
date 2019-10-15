@@ -33,7 +33,7 @@ bot.on('message', async msg => {
 })
 
 bot.on('text', async msg => {
-	$info(msg)
+	$info('Text message', JSON.stringify(msg))
 	if (msg.text!.startsWith('/')) {
 		const [cmd, ...args] = msg
 			.text!.slice(1)
@@ -56,7 +56,7 @@ bot.on('photo', async msg => {
 		chat: { id }
 	} = msg
 	const uid = msg.from!.id
-	$info(id, msg)
+	$info('Photo message', JSON.stringify(msg))
 	const imgobj = photo!.sort((a, b) => b.file_size! - a.file_size!)[0]
 	const link = await bot.getFileLink(imgobj.file_id)
 	const data: SauceNAOResponse = await xf
@@ -68,14 +68,14 @@ bot.on('photo', async msg => {
 			}
 		})
 		.json()
-	$info(id, link, data.results)
+	$info('SauceNAO result', id, link, JSON.stringify(data.results))
 	const min_s = await db.getUserData(uid, 'min_similarity', MIN_SIMILARITY)
 	const max_rc = await db.getUserData(uid, 'max_result_count', MAX_RESULT_COUNT)
 	const filteredResults = data.results.filter(r => parseFloat(r.header.similarity) >= min_s).slice(0, max_rc)
 	for (const r of filteredResults) {
 		await bot.sendPhoto(id, r.header.thumbnail, { caption: r.data.title ? r.data.title : '' })
 		await bot.sendMessage(id, createExtraMsgs(r))
-		$info(`Data sent to ${id}`, r)
+		$info(`Data sent to ${id}`, JSON.stringify(r))
 	}
 	if (filteredResults.length === 0) {
 		await bot.sendMessage(id, 'No image found!')
