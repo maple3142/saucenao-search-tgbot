@@ -18,21 +18,32 @@ DATABASE_URL=
 MINIUM_SIMILARITY=50
 MAX_RESULT_COUNT=3
 ```
+
 ![folder](https://imgur.com/8cyw56g.png)
+
 - Remove .env from .gitignore
+
 ![subl](https://imgur.com/xuAc9F1.png)
 
 ### Getting WEBHOOK_URL & DATABASE_URL
 
 - Goto [Heroku.com](https://signup.heroku.com/)
+
 ![site](https://imgur.com/4PT9yLd.png)
+
 - Create a new app with your desired name
+
 ![app](https://imgur.com/HIrtMHc.png)
 ![appdone](https://imgur.com/XX0H220.png)
+
 - Goto Resources and add Heroku Postgres
+
 ![resource](https://imgur.com/ku7F6hn.png)
+
 - Goto Settings
+
 ![settings](https://imgur.com/JuQvMhQ.png)
+
 - Add in Config Vars *YARN_PRODUCTION = false*
 - Use DATABASE_URL to add 
 ```
@@ -58,6 +69,7 @@ _Note: heroku_cli, [postgres](https://devcenter.heroku.com/articles/heroku-postg
 ```
 heroku git:remote -a saucenao-bot-test
 ```
+
 ![site](https://imgur.com/7m87H3M.png)
 ![deploy](https://imgur.com/jj1cyDl.png)
 ![Installing postgres](https://imgur.com/WShPuG3.png)
@@ -66,6 +78,7 @@ heroku git:remote -a saucenao-bot-test
 _`WEBHOOK_URL` is 'http://' or 'http://' + your hostname, such as `https://saucenao-tg-bot.mydomain.net`. (***Do not add a slash at the end***)_
 
 ### Talk to the Bot
+
 ![telegram](https://imgur.com/8qf8mGm.png)
 
 ## Local Deploy
@@ -82,6 +95,7 @@ DATABASE_URL=
 MINIUM_SIMILARITY=50
 MAX_RESULT_COUNT=3
 ```
+
 ![folder](https://imgur.com/8cyw56g.png)
 
 ### Make telegram bot & Get TG_TOKEN
@@ -104,4 +118,4 @@ _Note: You can add SAUCENAO_APIKEY from [saucenao.com](https://saucenao.com/user
 _Note: yarn should be installed at this point._
 - Replace [this line](https://github.com/maple3142/saucenao-search-tgbot/blob/master/src/index.ts#L20) with `polling: true`
 - Also remove [these lines](https://github.com/maple3142/saucenao-search-tgbot/blob/master/src/index.ts#L23-L26) too from the local files.
--`yarn start` to start the bot.
+- `yarn start` to start the bot.
