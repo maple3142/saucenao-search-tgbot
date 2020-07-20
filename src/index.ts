@@ -21,7 +21,13 @@ const bot = new TelegramBot(process.env.TG_TOKEN || '', {
 } as any) // temporary fix for: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/35206
 
 bot.openWebHook()
-	.then(() => bot.setWebHook((process.env.WEBHOOK_URL || '127.0.0.1') + '/bot' + process.env.TG_TOKEN))
+	.then(() =>
+		bot.setWebHook(
+			(process.env.WEBHOOK_URL || '127.0.0.1') +
+				'/bot' +
+				process.env.TG_TOKEN
+		)
+	)
 	.then(() => bot.getWebHookInfo())
 	.then($log)
 
@@ -59,25 +65,44 @@ bot.on('photo', async msg => {
 	$info('Photo message', JSON.stringify(msg))
 	const imgobj = photo!.sort((a, b) => b.file_size! - a.file_size!)[0]
 	const link = await bot.getFileLink(imgobj.file_id)
-	const data: SauceNAOResponse = await xf
-		.post('https://saucenao.com/search.php', {
-			urlencoded: {
-				url: link,
-				output_type: 2,
-				api_key: process.env.SAUCENAO_APIKEY
-			}
-		})
-		.json()
-	$info('SauceNAO result', id, link, JSON.stringify(data.results))
-	const min_s = await db.getUserData(uid, 'min_similarity', MIN_SIMILARITY)
-	const max_rc = await db.getUserData(uid, 'max_result_count', MAX_RESULT_COUNT)
-	const filteredResults = data.results.filter(r => parseFloat(r.header.similarity) >= min_s).slice(0, max_rc)
-	for (const r of filteredResults) {
-		await bot.sendPhoto(id, r.header.thumbnail, { caption: r.data.title ? r.data.title : '' })
-		await bot.sendMessage(id, createExtraMsgs(r))
-		$info(`Data sent to ${id}`, JSON.stringify(r))
-	}
-	if (filteredResults.length === 0) {
-		await bot.sendMessage(id, 'No image found!')
+	try {
+		const data: SauceNAOResponse = await xf
+			.post('https://saucenao.com/search.php', {
+				urlencoded: {
+					url: link,
+					output_type: 2,
+					api_key: process.env.SAUCENAO_APIKEY
+				}
+			})
+			.json()
+		$info('SauceNAO result', id, link, JSON.stringify(data.results))
+		const min_s = await db.getUserData(
+			uid,
+			'min_similarity',
+			MIN_SIMILARITY
+		)
+		const max_rc = await db.getUserData(
+			uid,
+			'max_result_count',
+			MAX_RESULT_COUNT
+		)
+		const filteredResults = data.results
+			.filter(r => parseFloat(r.header.similarity) >= min_s)
+			.slice(0, max_rc)
+		for (const r of filteredResults) {
+			await bot.sendPhoto(id, r.header.thumbnail, {
+				caption: r.data.title ? r.data.title : ''
+			})
+			await bot.sendMessage(id, createExtraMsgs(r))
+			$info(`Data sent to ${id}`, JSON.stringify(r))
+		}
+		if (filteredResults.length === 0) {
+			await bot.sendMessage(id, 'No image found!')
+		}
+	} catch (ex) {
+		await bot.sendMessage(
+			id,
+			'Failed to get data from SauceNAO due to quota limit.\nIf you can help (having a upgraded SauceNAO account or can donate), please contact @maple3142'
+		)
 	}
 })
