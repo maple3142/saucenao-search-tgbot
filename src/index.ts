@@ -102,7 +102,7 @@ bot.on('photo', async msg => {
 	} catch (ex) {
 		await bot.sendMessage(
 			id,
-			'Failed to get data from SauceNAO due to quota limit.\nIf you can help (having a upgraded SauceNAO account or can donate), please contact @maple3142'
+			'Failed to get data from SauceNAO due to quota limit.\nIf you can help by donating me to purchase SauceNAO premium account, please contact @maple3142'
 		)
 	}
 })
