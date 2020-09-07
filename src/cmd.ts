@@ -6,8 +6,9 @@ import { MIN_SIMILARITY, MAX_RESULT_COUNT } from './defaultvalues'
 export function help(bot: TelegramBot, msg: Message) {
 	bot.sendMessage(
 		msg.chat.id,
-		`Send or forward a image here, and I will search it on SauceNAO for you!\n
-Source Code: [maple3142/saucenao-search-tgbot](https://github.com/maple3142/saucenao-search-tgbot)\n
+		`Send or forward a image here, and I will search it on SauceNAO for you!
+You can use /get or /set to change some settings.
+Source Code: [maple3142/saucenao-search-tgbot](https://github.com/maple3142/saucenao-search-tgbot)
 View sponsors: /sponsors`,
 		{
 			parse_mode: 'Markdown'
@@ -22,7 +23,11 @@ const sponsorsList = [{ sponsor: '@AnimeChannel', amount: '10 USD' }]
 export function sponsors(bot: TelegramBot, msg: Message) {
 	bot.sendMessage(
 		msg.chat.id,
-		`I sincerely thanks these people for donating so that everyone can still enjoy this bot.\n${sponsorsList}`,
+		`I sincerely thanks these people for donating so that everyone can still enjoy this bot.
+
+${sponsorsList}
+
+If you want to donate to help me paying to bill of SauceNAO premium, please contact @maple3142. By donating, your name will be added to the list.`,
 		{ parse_mode: 'Markdown' }
 	)
 }
