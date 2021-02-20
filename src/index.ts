@@ -24,8 +24,8 @@ bot.openWebHook()
 	.then(() =>
 		bot.setWebHook(
 			(process.env.WEBHOOK_URL || '127.0.0.1') +
-				'/bot' +
-				process.env.TG_TOKEN
+			'/bot' +
+			process.env.TG_TOKEN
 		)
 	)
 	.then(() => bot.getWebHookInfo())
@@ -103,6 +103,9 @@ bot.on('photo', async msg => {
 		await bot.sendMessage(
 			id,
 			'Failed to get data from SauceNAO due to quota limit.\nIf you can help by donating me to purchase SauceNAO premium account, please contact @maple3142 or donate on [buymeacoffee](https://www.buymeacoffee.com/maple3142).'
+			, {
+				parse_mode: 'Markdown'
+			}
 		)
 	}
 })
